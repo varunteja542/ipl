@@ -1,0 +1,40 @@
+                       bat_team  avg_run_rate_first5
+0           Chennai Super Kings            15.906876
+1               Deccan Chargers            17.382390
+2                Delhi Capitals            18.953054
+3              Delhi Daredevils            17.186693
+4                 Gujarat Lions            19.279787
+5                Gujarat Titans            18.140078
+6               Kings XI Punjab            17.146891
+7          Kochi Tuskers Kerala            16.764706
+8         Kolkata Knight Riders            17.166263
+9          Lucknow Super Giants            16.037433
+10               Mumbai Indians            16.386215
+11                Pune Warriors            16.231977
+12                 Punjab Kings            18.528788
+13             Rajasthan Royals            17.099843
+14       Rising Pune Supergiant            16.778672
+15      Rising Pune Supergiants            15.997696
+16  Royal Challengers Bangalore            16.899866
+17          Sunrisers Hyderabad            16.993449
+Here are the team-specific average run rates for the first 5 overs (2008-2023):
+
+Team	Avg Run Rate (First 5 Overs)
+Chennai Super Kings	15.91
+Deccan Chargers	17.38
+Delhi Capitals	18.95
+Delhi Daredevils	17.19
+Gujarat Lions	19.28
+Gujarat Titans	18.14
+Kings XI Punjab	17.15
+Kochi Tuskers Kerala	16.76
+Kolkata Knight Riders	17.17
+Lucknow Super Giants	16.04
+Mumbai Indians	16.39
+Pune Warriors	16.23
+Punjab Kings	18.53
+Rajasthan Royals	17.10
+Rising Pune Supergiant	16.78
+Rising Pune Supergiants	16.00
+Royal Challengers Bangalore	16.90
+Sunrisers Hyderabad	16.99

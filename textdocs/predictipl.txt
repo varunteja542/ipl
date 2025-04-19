@@ -1,0 +1,73 @@
+import tkinter as tk
+from tkinter import messagebox
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from sklearn.preprocessing import MinMaxScaler
+
+# Load trained model
+model = tf.keras.models.load_model("lstm_ipl_model.h5")
+
+# Load and preprocess dummy data (to get feature scaling)
+df = pd.read_csv("ipl_data.csv")
+df = df.drop(columns=["mid", "date", "batsman", "bowler"], axis=1)
+df["overs"] = pd.to_numeric(df["overs"], errors="coerce").astype(int)
+df = pd.get_dummies(df, columns=["bat_team", "bowl_team", "venue"], drop_first=True)
+df = df.apply(pd.to_numeric, errors='coerce').dropna()
+
+scaler_x = MinMaxScaler()
+scaler_y = MinMaxScaler()
+X_scaled = scaler_x.fit_transform(df.drop(columns=["total"]))
+y_scaled = scaler_y.fit_transform(df[["total"]])
+
+# Function to make prediction
+def predict_score():
+    try:
+        overs = float(overs_entry.get())
+        runs = float(runs_entry.get())
+        wickets = float(wickets_entry.get())
+        runs_last5 = float(runs_last5_entry.get())
+        wickets_last5 = float(wickets_last5_entry.get())
+        
+        input_data = np.array([[overs, runs, wickets, runs_last5, wickets_last5]])
+        input_scaled = scaler_x.transform(input_data)
+        input_seq = np.array([input_scaled])  # Reshape to match model input
+        
+        pred_scaled = model.predict(input_seq)
+        pred_actual = scaler_y.inverse_transform(pred_scaled)[0][0]
+        
+        messagebox.showinfo("Prediction", f"Predicted Total Score: {pred_actual:.2f}")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+
+# GUI setup
+root = tk.Tk()
+root.title("IPL Score Predictor")
+root.geometry("400x300")
+
+# Input Fields
+tk.Label(root, text="Overs").pack()
+overs_entry = tk.Entry(root)
+overs_entry.pack()
+
+tk.Label(root, text="Current Runs").pack()
+runs_entry = tk.Entry(root)
+runs_entry.pack()
+
+tk.Label(root, text="Wickets").pack()
+wickets_entry = tk.Entry(root)
+wickets_entry.pack()
+
+tk.Label(root, text="Runs in Last 5 Overs").pack()
+runs_last5_entry = tk.Entry(root)
+runs_last5_entry.pack()
+
+tk.Label(root, text="Wickets in Last 5 Overs").pack()
+wickets_last5_entry = tk.Entry(root)
+wickets_last5_entry.pack()
+
+# Predict Button
+predict_btn = tk.Button(root, text="Predict Score", command=predict_score)
+predict_btn.pack()
+
+root.mainloop()

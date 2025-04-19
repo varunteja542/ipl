@@ -1,0 +1,61 @@
+Here’s a detailed description of your IPL score prediction architecture:
+
+---
+
+### 🏗️ **1. Data Ingestion:**  
+- **Input:** Historical IPL match data in CSV format.  
+- **Process:** Load the dataset using Pandas and clean it by dropping unnecessary columns like "striker", "non-striker", and "date".  
+
+---
+
+### 📊 **2. Data Preprocessing:**  
+- **One-Hot Encoding:** Convert categorical features like "bat_team", "bowl_team", and "venue" into numerical values.  
+- **Scaling:** Use `StandardScaler` to normalize both features and target values, ensuring the model trains effectively.  
+
+---
+
+### 🔗 **3. Sequence Preparation:**  
+- **Window Creation:** Prepare sequences of 10 consecutive overs to capture time dependencies, essential for the LSTM model.  
+- **Input-Output Split:** Split the data into features (`X`) and target (`y`) sequences.  
+
+---
+
+### 🧠 **4. Model Training (Pre-Built):**  
+- **LSTM Model:**  
+   - Two stacked LSTM layers to capture sequential patterns.  
+   - Dropout layers to prevent overfitting.  
+   - Dense layers for output generation.  
+- **Compilation & Training:**  
+   - Optimizer: Adam.  
+   - Loss Function: Mean Squared Error (MSE).  
+- **Output:** Saved trained model (`ipl_lstm_model.h5`).  
+
+---
+
+### 📤 **5. Prediction Process:**  
+- **Load Model:** The trained LSTM model is loaded from the saved file.  
+- **Input Preparation:**  
+   - Accepts manual inputs: "Runs", "Wickets", "Overs", "Runs in Last 5 Overs", and "Wickets in Last 5 Overs".  
+   - Applies one-hot encoding and scaling to match training data format.  
+- **Prediction:**  
+   - Pass the prepared inputs through the LSTM model.  
+   - Inverse transform the predicted score to get the actual value.  
+
+---
+
+### 📈 **6. Evaluation:**  
+- **Metrics:** Calculate RMSE, MAE, and Accuracy to assess model performance.  
+- **Visualization:** Plot actual vs. predicted scores for easier comparison.  
+
+---
+
+### ⚙️ **7. Output:**  
+- **Displayed Results:**  
+   - Predicted Total Score.  
+   - Accuracy of the prediction.  
+- **User Interaction:**  
+   - Provides an option to manually input data and get real-time predictions.  
+
+---
+
+Would you like me to improve any part of the architecture or add additional insights? 🚀 Let me know!

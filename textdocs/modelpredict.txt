@@ -1,0 +1,92 @@
+# === REQUIRED ===
+import ipywidgets as widgets
+from IPython.display import display
+import joblib
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+# === Load trained model and tools ===
+model = tf.keras.models.load_model("ipl_lstm_model_one.keras", compile=False)
+model.compile(optimizer="adam", loss="mse")
+
+preprocessor = joblib.load("preprocessor.save")
+scaler_x = joblib.load("scaler_x_one.save")
+scaler_y = joblib.load("scaler_y_one.save")
+le_batsman = joblib.load("le_batsman_one.save")
+le_bowler = joblib.load("le_bowler_one.save")
+
+# === Get unique values for dropdowns ===
+df = pd.read_csv("ipl_dataset_1.csv")
+venues = df["venue"].unique().tolist()
+bat_teams = df["bat_team"].unique().tolist()
+bowl_teams = df["bowl_team"].unique().tolist()
+batsmen = df["batsman"].unique().tolist()
+bowlers = df["bowler"].unique().tolist()
+
+# === Widgets ===
+venue_w = widgets.Dropdown(options=venues, description="Venue:")
+bat_team_w = widgets.Dropdown(options=bat_teams, description="Bat Team:")
+bowl_team_w = widgets.Dropdown(options=bowl_teams, description="Bowl Team:")
+batsman_w = widgets.Dropdown(options=batsmen, description="Batsman:")
+bowler_w = widgets.Dropdown(options=bowlers, description="Bowler:")
+
+# === Correct Over and Ball ===
+over_w = widgets.IntSlider(min=0, max=20, step=1, description="Over:")
+ball_w = widgets.IntSlider(min=0, max=5, step=1, description="Ball:")
+
+runs_w = widgets.IntSlider(min=0, max=300, step=1, description="Runs:")
+wickets_w = widgets.IntSlider(min=0, max=10, step=1, description="Wickets:")
+runs_last5_w = widgets.IntSlider(min=0, max=100, step=1, description="Runs (last5):")
+wickets_last5_w = widgets.IntSlider(min=0, max=5, step=1, description="Wickets (last5):")
+runrate_w = widgets.FloatSlider(min=0.0, max=15.0, step=0.1, description="Runrate:")
+
+predict_btn = widgets.Button(description="Predict Total Score 🚩", button_style="success")
+output = widgets.Output()
+
+# === Prediction Function ===
+def predict(b):
+    with output:
+        output.clear_output()
+
+        # ✅ Convert over and ball to valid decimal overs
+        actual_overs = over_w.value + (ball_w.value / 6)
+
+        # ✅ Prepare input
+        input_dict = {
+            "venue": [venue_w.value],
+            "bat_team": [bat_team_w.value],
+            "bowl_team": [bowl_team_w.value],
+            "batsman": [le_batsman.transform([batsman_w.value])[0]],
+            "bowler": [le_bowler.transform([bowler_w.value])[0]],
+            "overs": [actual_overs],
+            "runs": [runs_w.value],
+            "wickets": [wickets_w.value],
+            "runs_last_5": [runs_last5_w.value],
+            "wickets_last_5": [wickets_last5_w.value],
+            "runrate": [runrate_w.value]
+        }
+
+        input_df = pd.DataFrame(input_dict)
+
+        # === Encoding and Scaling ===
+        X_encoded = preprocessor.transform(input_df).toarray()
+        X_scaled = scaler_x.transform(X_encoded)
+
+        # === Create dummy sequence for LSTM ===
+        SEQ_LEN = 10
+        X_seq = np.repeat(X_scaled, SEQ_LEN, axis=0).reshape(1, SEQ_LEN, -1).astype(np.float32)
+
+        # === Prediction ===
+        y_pred = model.predict(X_seq)
+        y_pred_actual = scaler_y.inverse_transform(y_pred)
+
+        # === Display ===
+        print(f"🏏 Predicted Total Score: {y_pred_actual[0][0]:.2f}")
+
+predict_btn.on_click(predict)
+
+# === DISPLAY ===
+display(venue_w, bat_team_w, bowl_team_w, batsman_w, bowler_w,
+        over_w, ball_w, runs_w, wickets_w, runs_last5_w, wickets_last5_w, runrate_w,
+        predict_btn, output)
